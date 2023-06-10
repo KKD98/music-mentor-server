@@ -98,6 +98,19 @@ async function run() {
       const result = {instructor: user?.role === 'instructor'};
       res.send(result);
     })
+    
+    app.get('/users/student/:email',verifyJWT, async(req, res) => {
+      const email = req.params.email;
+
+      if(req.decoded.email !== email){
+        res.send({student: false})
+      }
+
+      const query = {email: email}
+      const user = await usersCollection.findOne(query);
+      const result = {student: user?.role === 'student'};
+      res.send(result);
+    })
 
     app.patch('/users/:id' , async(req , res) => {
       const id = req.params.id;
