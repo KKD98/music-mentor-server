@@ -56,6 +56,7 @@ async function run() {
       res.send({ token })
     })
 
+
     // Users related apis start-------------------
     app.get('/users', verifyJWT,  async (req , res) => {
       const result = await usersCollection.find().toArray();
@@ -98,7 +99,7 @@ async function run() {
       const result = {instructor: user?.role === 'instructor'};
       res.send(result);
     })
-    
+
     app.get('/users/student/:email',verifyJWT, async(req, res) => {
       const email = req.params.email;
 
@@ -134,6 +135,10 @@ async function run() {
     //           classes related apis start
     // -----------------------------------------------
 
+    app.get('/allclass', async(req, res) => {
+      const result = await allClassesCollection.find().toArray();
+      res.send(result);
+    })
 
     app.post('/addclass', async(req, res) => {
       const newClass = req.body;
