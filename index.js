@@ -153,6 +153,7 @@ async function run() {
 
     app.get('/allclass', async(req, res) => {
       const result = await allClassesCollection.find().toArray();
+      console.log(result)
       res.send(result);
     })
 
@@ -165,6 +166,12 @@ async function run() {
     app.post('/selectedclasses', async(req, res) => {
       const item = req.body;
       const result = await selectedClassesCollection.insertOne(item);
+      res.send(result);
+    })
+
+    app.get('/myselectedclass/:email' , async(req, res) => {
+      const email = req.params.email;
+      const result = await selectedClassesCollection.find({email: email}).toArray();
       res.send(result);
     })
 
