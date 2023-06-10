@@ -162,7 +162,11 @@ async function run() {
       res.send(result);
     })
 
-   
+    app.post('/selectedclasses', async(req, res) => {
+      const item = req.body;
+      const result = await selectedClassesCollection.insertOne(item);
+      res.send(result);
+    })
 
 
     // -----------------------------------------------
