@@ -49,6 +49,7 @@ async function run() {
 
     const usersCollection = client.db("musicMentor").collection("users");
     const allClassesCollection = client.db("musicMentor").collection("allClasses");
+    const selectedClassesCollection = client.db("musicMentor").collection("selectedClasses");
 
     app.post('/jwt' , (req , res) => {
       const user = req.body;
@@ -132,6 +133,21 @@ async function run() {
     // -----------------------------------------------
 
     // -----------------------------------------------
+    //             Instructor related apis start
+    // -----------------------------------------------
+
+    app.get('/allinstructors',  async (req , res) => {
+      const result = await usersCollection.find({role: "instructor"}).toArray();
+      res.send(result);
+    })
+
+    // -----------------------------------------------
+    //             Instructor related apis end
+    // -----------------------------------------------
+
+
+
+    // -----------------------------------------------
     //           classes related apis start
     // -----------------------------------------------
 
@@ -145,6 +161,8 @@ async function run() {
       const result = await allClassesCollection.insertOne(newClass);
       res.send(result);
     })
+
+   
 
 
     // -----------------------------------------------
