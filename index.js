@@ -46,7 +46,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const usersCollection = client.db("musicMentor").collection("users");
     const allClassesCollection = client.db("musicMentor").collection("allClasses");
@@ -217,6 +217,11 @@ async function run() {
 
     app.get('/allclass', async(req, res) => {
       const result = await allClassesCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.get('/approvedclass', async(req, res) => {
+      const result = await allClassesCollection.find({status: 'approved'}).toArray();
       res.send(result);
     })
 
