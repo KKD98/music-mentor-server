@@ -143,6 +143,64 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/popularinstructors', async(req , res) => {
+      const result = await usersCollection.aggregate([
+        {
+            "$match" : {
+                "role" : "instructor"
+            }
+        }, 
+        {
+            "$lookup" : {
+                "from" : "allClasses",
+                "localField" : "email",
+                "foreignField" : "instructor_email",
+                "as" : "classes"
+            }
+        }, 
+        {
+            "$unwind" : {
+                "path" : "$classes"
+            }
+        }, 
+        {
+            "$group" : {
+                "_id" : "$_id",
+                "instructor_name" : {
+                    "$first" : "$name"
+                },
+                "image" : {
+                    "$first" : "$image"
+                },
+                "email" : {
+                    "$first" : "$email"
+                },
+                "class_names" : {
+                    "$addToSet" : "$classes.class_name"
+                },
+                "total_enrolled_students" : {
+                    "$sum" : "$classes.enrolled_student"
+                }
+            }
+        }, 
+        {
+            "$sort" : {
+                "total_enrolled_students" : -1
+            }
+        }, 
+        {
+            "$limit" : 6
+        }
+    ]).toArray();
+
+    res.send(result)
+    
+    })
+
+    // app.get('/popularinstructor', async(req, res) => {
+
+    // })
+
     // -----------------------------------------------
     //             Instructor related apis end
     // -----------------------------------------------
@@ -221,7 +279,7 @@ async function run() {
       const deleteClass = await selectedClassesCollection.deleteOne(query);
 
       const classQuery = {_id: new ObjectId(payment.classItemId)}
-      const updateClass = await allClassesCollection.findOneAndUpdate(classQuery, {$inc: {available_seats: -1}},{new: true})
+      const updateClass = await allClassesCollection.findOneAndUpdate(classQuery, {$inc: {available_seats: -1, enrolled_student: 1}},{new: true})
 
 
       res.send({result, deleteClass, updateClass});
