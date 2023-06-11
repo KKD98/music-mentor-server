@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 
 
@@ -50,6 +51,7 @@ async function run() {
     const usersCollection = client.db("musicMentor").collection("users");
     const allClassesCollection = client.db("musicMentor").collection("allClasses");
     const selectedClassesCollection = client.db("musicMentor").collection("selectedClasses");
+    const paymentCollection = client.db("musicMentor").collection("payments");
 
     app.post('/jwt' , (req , res) => {
       const user = req.body;
@@ -153,7 +155,6 @@ async function run() {
 
     app.get('/allclass', async(req, res) => {
       const result = await allClassesCollection.find().toArray();
-      console.log(result)
       res.send(result);
     })
 
@@ -186,6 +187,45 @@ async function run() {
     // -----------------------------------------------
     //           classes related apis end
     // -----------------------------------------------
+
+    // ---------------------------------------------
+    //           CREATE PAYMENT INTENT
+    // ---------------------------------------------
+
+    app.post('/create-payment-intent',verifyJWT,  async(req, res) => {
+      const {classItem} = req.body;
+      const price = classItem.price;
+      const amount = price*100;
+      console.log(price , amount)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      });
+
+      
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      })
+
+    })
+
+    // ------------------------
+    // PAYMENT RELATED API
+    // -----------------------
+    app.post('/payments',verifyJWT, async(req, res) => {
+      const payment = req.body;
+      const result = await paymentCollection.insertOne(payment);
+
+      const query = { classItemId: payment.classItemId, email: payment.email};
+      const deleteClass = await selectedClassesCollection.deleteOne(query);
+
+      const classQuery = {_id: new ObjectId(payment.classItemId)}
+      const updateClass = await allClassesCollection.findOneAndUpdate(classQuery, {$inc: {available_seats: -1}},{new: true})
+
+
+      res.send({result, deleteClass, updateClass});
+    })
 
 
     // Send a ping to confirm a successful connection
