@@ -227,6 +227,14 @@ async function run() {
       res.send({result, deleteClass, updateClass});
     })
 
+    app.get('/payments/:email', async(req, res) => {
+      const email = req.params.email;
+      const result = await paymentCollection.find({email: email}).sort({_id: -1}).toArray();
+      res.send(result);
+    })
+
+    // ---------------------
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
