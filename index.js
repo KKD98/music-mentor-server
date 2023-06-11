@@ -246,6 +246,39 @@ async function run() {
       res.send(result);
     })
 
+    app.patch('/allclass/:id' , async(req , res) => {
+      const id = req.params.id;
+      console.log(id)
+      const status = req.body.status;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: status
+        },
+      };
+
+      const result = await allClassesCollection.updateOne(filter , updateDoc);
+      res.send(result);
+
+    })
+
+    app.patch('/classfeedback/:id' , async(req , res) => {
+      const id = req.params.id;
+      console.log(id)
+      const feedback = req.body.feedback;
+      console.log(feedback)
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          feedback: feedback
+        },
+      };
+
+      const result = await allClassesCollection.updateOne(filter , updateDoc);
+      res.send(result);
+
+    })
+
 
     // -----------------------------------------------
     //           classes related apis end
