@@ -197,9 +197,13 @@ async function run() {
     
     })
 
-    // app.get('/popularinstructor', async(req, res) => {
-
-    // })
+    app.get('/myclass/:email', async(req, res) => {
+      const email = req.params.email;
+      console.log(email)
+      const result = await allClassesCollection.find({instructor_email: email}).toArray();
+      console.log(result)
+      res.send(result);
+    })
 
     // -----------------------------------------------
     //             Instructor related apis end
