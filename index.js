@@ -283,6 +283,21 @@ async function run() {
 
     })
 
+    app.patch('/updateclass/:id' , async(req , res) => {
+      const id = req.params.id;
+      console.log(id)
+      const data = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: data
+      }
+
+
+      const result = await allClassesCollection.updateOne(filter , updateDoc, {new: true});
+      res.send(result);
+
+    })
+
 
     // -----------------------------------------------
     //           classes related apis end
