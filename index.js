@@ -241,6 +241,11 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/popularclasses', async(req, res) => {
+      const result = await allClassesCollection.find().sort({enrolled_student: -1}).limit(6).toArray();
+      res.send(result);
+    })
+
 
     // -----------------------------------------------
     //           classes related apis end
